@@ -5,9 +5,10 @@ using UnityEngine;
 public class joueure : MonoBehaviour
 {
     // Start is called before the first frame update
-    float vitessaut = 8.0f ;
-    float vitesseh = 3.0f;
-    float vitesstourne = -1.5f;
+    public float vitessaut ;//= 8.0f ;
+    public float vitesseh ;//= 3.0f;
+    public float vitesstourne ;//= -1.5f;
+    public bool estmort = false;
     Rigidbody2D joueurephy ;
     GameObject rotator;
 
@@ -24,7 +25,8 @@ public class joueure : MonoBehaviour
             return distance < 0.33f ;
         }
     }
-    
+
+
     void Start()
     {
        joueurephy = GetComponent<Rigidbody2D>();       
@@ -73,11 +75,22 @@ public class joueure : MonoBehaviour
                 rotator.transform.rotation = Quaternion.Euler(0,0,0);
             }     
         }
-        Debug.Log("angle: " + rotator.transform.rotation.eulerAngles.z);
         Vector2 bougex = joueurephy.velocity  ;
         bougex[0] = vitesseh;
         joueurephy.velocity = bougex;  
+
+        //si touche un mur
     }
+
+    void OnTriggerEnter2D(Collider2D collideur)//si touche un pique
+    {
+         if( collideur.tag == "pique")
+            estmort = true;
+    }
+
+
+
+
 }
 
 
