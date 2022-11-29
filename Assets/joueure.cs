@@ -6,8 +6,11 @@ public class joueure : MonoBehaviour
 {
     // Start is called before the first frame update
     float vitessaut = 8.0f ;
-    float vitesseh = 2.0f;
+    float vitesseh = 3.0f;
+    float vitesstourne = -1.5f;
     Rigidbody2D joueurephy ;
+    GameObject rotator;
+
     bool asapce = true ;
     public bool doestouchsol(RaycastHit2D touchesol)
     {
@@ -24,18 +27,22 @@ public class joueure : MonoBehaviour
     
     void Start()
     {
-       joueurephy = GetComponent<Rigidbody2D>();         
+       joueurephy = GetComponent<Rigidbody2D>();       
+       rotator = transform.GetChild (0).gameObject;  
     }
 
     // Update is called once per frame
     void Update()
     {
         Vector2 coordray = new Vector2(joueurephy.transform.position.x , joueurephy.transform.position.y - 0.64f);
-        RaycastHit2D touchesol = Physics2D.Raycast( joueurephy.transform.position , Vector2.down , 1.0f , LayerMask.GetMask("soll") );
+        RaycastHit2D rtouchesol = Physics2D.Raycast( joueurephy.transform.position , Vector2.down , 1.0f , LayerMask.GetMask("soll") );
 
-        if (Input.GetKey(KeyCode.Space) && asapce && doestouchsol(touchesol) ) //quand on touche espace et le sol
+
+        bool touchsol = doestouchsol(rtouchesol) ;
+        if (Input.GetKey(KeyCode.Space) && asapce && touchsol ) //quand on touche espace et le sol
         { 
-            asapce = false ; Vector2 bougey = joueurephy.velocity  ;
+            asapce = false ; 
+            Vector2 bougey = joueurephy.velocity  ;
             bougey[1] = vitessaut;
             joueurephy.velocity = bougey;
         }
@@ -43,6 +50,30 @@ public class joueure : MonoBehaviour
         {
             asapce = true ;
         }
+        if(!touchsol) //quand ca tourne
+        {
+           rotator.transform.Rotate(0.0f, 0.0f, vitesstourne, Space.Self);            
+        }
+        else // quand ca retouche le sol on redresse le cube
+        {                            
+            if (rotator.transform.rotation.eulerAngles.z <= 315 && rotator.transform.rotation.eulerAngles.z > 225 )
+            {
+                rotator.transform.rotation = Quaternion.Euler(0,0,270);
+            }
+            else if (rotator.transform.rotation.eulerAngles.z <= 225 && rotator.transform.rotation.eulerAngles.z > 135  )
+            {
+                rotator.transform.rotation = Quaternion.Euler(0,0,180);
+            }
+            else if(rotator.transform.rotation.eulerAngles.z <= 135 && rotator.transform.rotation.eulerAngles.z > 45   )
+            {
+                 rotator.transform.rotation = Quaternion.Euler(0,0,90);
+            }
+            else
+            {
+                rotator.transform.rotation = Quaternion.Euler(0,0,0);
+            }     
+        }
+        Debug.Log("angle: " + rotator.transform.rotation.eulerAngles.z);
         Vector2 bougex = joueurephy.velocity  ;
         bougex[0] = vitesseh;
         joueurephy.velocity = bougex;  
